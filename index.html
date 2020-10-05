@@ -25,20 +25,37 @@
             height: 550px;
             border: solid 10px black;
         }
+        #canvas3{
+            opacity: 0.2;
+            position: absolute;
+            width: 550px;
+            height: 550px;
+            border: solid 10px black;
+        }
+        #image1{
+            opacity: 0;
+            position: absolute;
+            width: 550px;
+            height: 550px;
+            border: solid 10px black;
+        }
     </style>
 </head>
 <body>
+    <img src="sigma.jpg" id="image1">
     <canvas height="1000" width="1000" id="canvas1"></canvas>
     <canvas height="1000" width="1000" id="canvas2"></canvas>
-    
-    
+    <canvas height="1000" width="1000" id="canvas3"></canvas>
     
     <script>
         // Get canvas context
+        const image1 = document.querySelector("#image1")
         const canvasLayer1 = document.querySelector("#canvas1")
         const canvasLayer2 = document.querySelector("#canvas2")
+        const canvasLayer3 = document.querySelector("#canvas3")
         const ctx = canvasLayer1.getContext('2d')
         const ctx2 = canvasLayer2.getContext('2d')
+        const ctx3 = canvasLayer3.getContext('2d')
 
         // Time of program
         let time = 0
@@ -120,6 +137,14 @@
                 if(removePoints){
                     drawAxies = []
                 }
+            }
+
+            addImage(){
+                ctx3.drawImage(image1, 0, 0)
+            }
+
+            removeImage(){
+                ctx3.clearRect(0, 0, 1000, 1000)
             }
         }
 
@@ -250,14 +275,14 @@
         setInterval(render, 1)
 
         function getMousePosition(evt){
-            let rect = canvasLayer2.getBoundingClientRect()
+            let rect = canvasLayer3.getBoundingClientRect()
             return {
                 x: ((evt.clientX - rect.left - 10) / 550 * 1000 - 500) / 100,
                 y: (500 - (evt.clientY - rect.top -10) / 550 * 1000) / 100,
             }
         }
 
-        canvasLayer2.addEventListener('click', evt => {
+        canvasLayer3.addEventListener('click', evt => {
 
             let mousePosition = getMousePosition(evt)
             let randomId = Math.floor(Math.random() * 99999)
