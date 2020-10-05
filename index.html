@@ -9,13 +9,16 @@
             margin: 0;
             padding: 0;
         }
-        #screen1{
+        body{
+            background-color: rgb(46, 46, 46);
+        }
+        #canvas1{
             position: absolute;
             width: 550px;
             height: 550px;
             border: solid 10px black;
         }
-        #screen2{
+        #canvas2{
             opacity: 0.8;
             position: absolute;
             width: 550px;
@@ -25,74 +28,42 @@
     </style>
 </head>
 <body>
-    <canvas height="1000" width="1000" id="screen1"></canvas>
-    <canvas height="1000" width="1000" id="screen2"></canvas>
+    <canvas height="1000" width="1000" id="canvas1"></canvas>
+    <canvas height="1000" width="1000" id="canvas2"></canvas>
     
     
     
     <script>
-        const canvas = document.getElementById("screen1")
-        const ctx = canvas.getContext('2d')
-        const drawCanvas = document.getElementById("screen2")
-        const ctx2 = drawCanvas.getContext('2d')
+        // Get canvas context
+        const canvasLayer1 = document.querySelector("#canvas1")
+        const canvasLayer2 = document.querySelector("#canvas2")
+        const ctx = canvasLayer1.getContext('2d')
+        const ctx2 = canvasLayer2.getContext('2d')
 
+        // Time of program
         let time = 0
-        let circles = {}
-        let drawPoints = []  
-
-        function addCircle(control = [1, 0], velocity = 1){
-
-            let randomId = Math.floor(Math.random() * 99999)
-
-            circles[randomId] = {
-                control,
-                velocity
+        let circles = {
+            /*
+            c:{
+                control: [2, 1] = 2 + i
+                velocity: 1 = 1 circle/s 
             }
+            */
         }
-
-        function setCircles(vectorsLength){
-
-            circles = {}
-
-            for(let initial = vectorsLength; initial <= -vectorsLength; initial++){
-                addCircle([0,0], initial)
-            }
-
-            const pointsLength = Object.keys(drawPoints).length
-            const dt = 1 / pointsLength
-
-            for(const circleId in circles){
-
-                const circle = circles[circleId]
-
-                let input = 0
-
-                for(const pointId in drawPoints){
-                    const output = drawPoints[pointId]
-
-                    let term = [
-                        Math.cos(-2 * Math.PI * input * circle.velocity),
-                        Math.sin(-2 * Math.PI * input * circle.velocity),
-                    ]
-
-
-                    circle.control[0] += (output[0] * term[0] + output[1] * term[1] * (-1)) * dt
-                    circle.control[1] += (output[0] * term[1] + output[1] * term[0]) * dt
-
-                    input += dt
-                }
-                
-            }
-        }
+        let drawAxies = [
+            // [2, 5] = 2 + 5i
+        ]  
+        let showPoints = true
 
         class Draw{
-            grid(grid = true){
+            background(activateGrid = true){
                 ctx.fillRect(0, 0, 1000, 1000)
                 ctx.fillStyle = "black"
 
-                if(grid){
-                    let countery = 5
-                    let counterx = -5
+                if(activateGrid){
+
+                    let counterX = -5
+                    let counterY = 5
 
                     for(let y = 0; y < 1000; y += 100){
                         ctx.beginPath()
@@ -104,8 +75,9 @@
 
                         ctx.font = "20px Arial"
                         ctx.strokeStyle = "rgba(255, 255, 255, 0.2)"
-                        ctx.strokeText(`${countery--} i`, 505, y + 20)
+                        ctx.strokeText(`${counterY--} i`, 505, y + 20)
                     }
+
                     for(let x = 0; x < 1000; x += 100){
                         ctx.beginPath()
                         ctx.moveTo(x, 0)
@@ -115,78 +87,162 @@
 
                         ctx.font = "20px Arial"
                         ctx.strokeStyle = "rgba(255, 255, 255, 0.2)"
-                        ctx.strokeText(`${counterx++}`, x + 5, 520)
+                        ctx.strokeText(`${counterX++}`, x + 5, 520)
                     }
                 }
             }
+
             circle(x, y, r){
                 ctx.beginPath()
                 ctx.arc(500 + x * 100, 500 - y * 100, r * 100, 0, 2*Math.PI)
                 ctx.strokeStyle = "rgba(25, 255, 255, 0.3)"
                 ctx.lineWidth = 2
                 ctx.stroke()
-                
             }
+
             vector(xi, yi, xe, ye){
                 ctx.beginPath()
                 ctx.moveTo(500 + xi * 100, 500 - yi * 100)
                 ctx.lineTo(500 + xe * 100, 500 - ye * 100)
-                ctx.lineWidth = 5
+                ctx.lineWidth = 3
                 ctx.strokeStyle = "rgba(255, 255, 255, 0.7)"
                 ctx.stroke()
             }
+
             point(x, y){
                 ctx2.fillStyle = "rgba(255, 255, 25, 0.8)"
                 ctx2.fillRect(500 + x * 100, 500 - y * 100, 3, 3)
             }
-            clear(points = false){
+
+            clear(removePoints = false){
                 ctx2.clearRect(0, 0, 1000, 1000)
                 circles = {}
-                if(points){
-                    drawPoints = []
+                if(removePoints){
+                    drawAxies = []
                 }
             }
         }
 
         const draw = new Draw()
-        let showPoints = true
-        
-        function render(){
-            
-            draw.grid()
 
-            let center = [0, 0]
-            let functionC = [0, 0]
-            let circlePart = [0, 0]
+        function addCircle(control = [1, 0], velocity = 1){
+
+            // Random name
+            let randomId = Math.floor(Math.random() * 99999)
+
+            circles[randomId] = {
+                control,
+                velocity
+            }
+        }
+
+        function setCircles(circlesLength){
+
+            /*
+            VectorsLength - The length of number of circles
+            Exemple: -5 = velocity starts -5 to the 5, so 11 circles
+            */
+
+            for(
+                let initial = circlesLength; 
+                initial <= -circlesLength; 
+                initial++
+            ){
+                addCircle([0,0], initial)
+            }
+
+            // Number of points and the time's variation
+            const numberOfPoints = Object.keys(drawAxies).length
+            const dt = 1 / numberOfPoints
 
             for(const circleId in circles){
 
                 const circle = circles[circleId]
 
-                center[0] = functionC[0]
-                center[1] = functionC[1]
+                // Input of function
+                let input = 0
 
-                circlePart[0] = Math.cos(2 * Math.PI * time * circle.velocity) 
-                circlePart[1] = Math.sin(2 * Math.PI * time * circle.velocity) 
+                for(const pointId in    drawAxies){
+                    // Output of function: [a, bi]
+                    const output =    drawAxies[pointId]
+
+                    // e^{term}
+                    let term = [
+                        Math.cos(-2 * Math.PI * input * circle.velocity),
+                        Math.sin(-2 * Math.PI * input * circle.velocity),
+                    ]
+
+                    // Calculate Integral
+                    circle.control[0] += (output[0] * term[0] + output[1] * term[1] * (-1)) * dt
+                    circle.control[1] += (output[0] * term[1] + output[1] * term[0]) * dt
+
+                    // Add time's variation
+                    input += dt
+                }
                 
-                functionC[0] += circle.control[0] * circlePart[0] + circle.control[1] * (-circlePart[1])
-                functionC[1] += circle.control[0] * circlePart[1] + circle.control[1] * circlePart[0]
+            }
+        }
+        
+        function render(){
+            
+            draw.background()
+
+            /*
+            Center of circles - [a, bi]
+            Complex function - time -> [a, bi]
+            
+            */
+            let center = [0, 0]
+            let complexFunc = [0, 0]
+
+            // Sum of each circle
+            for(const circleId in circles){
+
+                const circle = circles[circleId]
+
+                // Before modification
+                center[0] = complexFunc[0]
+                center[1] = complexFunc[1]
+
+                // Initial Circle - time -> [a, bi]
+                let initialCircle = [
+                    Math.cos(2 * Math.PI * time * circle.velocity),
+                    Math.sin(2 * Math.PI * time * circle.velocity) 
+                ]
                 
-                draw.circle(center[0], center[1], Math.sqrt(Math.pow(circle.control[0], 2) + Math.pow(circle.control[1], 2)))
-                draw.vector(center[0], center[1], functionC[0], functionC[1])
+                // Sum of circle
+                complexFunc[0] += circle.control[0] * initialCircle[0] - circle.control[1] * initialCircle[1]
+                complexFunc[1] += circle.control[0] * initialCircle[1] + circle.control[1] * initialCircle[0]
+                
+                // Draw circle/vector
+                draw.circle(
+                    center[0], 
+                    center[1], 
+                    Math.sqrt(Math.pow(circle.control[0], 2) + Math.pow(circle.control[1], 2))
+                )
+                draw.vector(
+                    center[0], 
+                    center[1], 
+                    complexFunc[0], 
+                    complexFunc[1]
+                )
                 
             }
 
-            
-            draw.point(functionC[0], functionC[1])
+            // Draw output of function
+            draw.point(
+                complexFunc[0], 
+                complexFunc[1]
+            )
             
             if(showPoints){
-                for(let pointId in drawPoints){
-                    const point = drawPoints[pointId]
+                for(let pointId in drawAxies){
+                    const point = drawAxies[pointId]
                     draw.circle(point[0], point[1], 0.05)
                 }
             }
             
+            // Add 1 milisecound
             time += 1 / 1000
             
         }
@@ -194,19 +250,19 @@
         setInterval(render, 1)
 
         function getMousePosition(evt){
-            let rect = drawCanvas.getBoundingClientRect()
+            let rect = canvasLayer2.getBoundingClientRect()
             return {
                 x: ((evt.clientX - rect.left - 10) / 550 * 1000 - 500) / 100,
                 y: (500 - (evt.clientY - rect.top -10) / 550 * 1000) / 100,
             }
         }
 
-        drawCanvas.addEventListener('click', evt => {
+        canvasLayer2.addEventListener('click', evt => {
 
             let mousePosition = getMousePosition(evt)
             let randomId = Math.floor(Math.random() * 99999)
             
-            drawPoints.push([mousePosition.x, mousePosition.y])
+            drawAxies.push([mousePosition.x, mousePosition.y])
         })
 
     </script>
