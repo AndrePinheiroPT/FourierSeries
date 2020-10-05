@@ -1,0 +1,3 @@
+# Fourier Series
+
+Work in progress...
