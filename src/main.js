@@ -22,23 +22,23 @@ setEditMode()
 
 // Time of program
 let time = 0
-let circles = {
-    /*
-    c:{
-        control: [2, 1] = 2 + i
-        velocity: 1 = 1 circle/s 
-    }
-    */
-}
-let points = [
-    // [2, 5] = 2 + 5i
-]  
+let circles = {}
+let points = []  
 
 let showPoints = true
 let mouseAxies = [0, 0]
 
 const draw = new Draw()
 
+
+
+function getMousePosition(evt){
+    let rect = canvasLayer2.getBoundingClientRect()
+    return {
+        x: ((evt.clientX - rect.left - 10) / 550 * 1000 - 500) / 100,
+        y: (500 - (evt.clientY - rect.top -10) / 550 * 1000) / 100,
+    }
+}
 function addCircle(control = [1, 0], velocity = 1){
 
     // Random name
@@ -50,57 +50,36 @@ function addCircle(control = [1, 0], velocity = 1){
     }
 }
 
-function getMousePosition(evt){
-    let rect = canvasLayer2.getBoundingClientRect()
-    return {
-        x: ((evt.clientX - rect.left - 10) / 550 * 1000 - 500) / 100,
-        y: (500 - (evt.clientY - rect.top -10) / 550 * 1000) / 100,
-    }
-}
-
-function setCircles(circlesLength){
-
-    /*
-    VectorsLength - The length of number of circles
-    Exemple: -5 = velocity starts -5 to the 5, so 11 circles
-    */
-
-    for(
-        let initial = circlesLength; 
-        initial <= -circlesLength; 
-        initial++
-    ){
-        addCircle([0,0], initial)
-    }
-
+export function setCircles(circlesLength){
     // time's variation
     const dt = 1 / points.length
-
-    for(const circleId in circles){
-
-        const circle = circles[circleId]
-
-        // Input of function
+    for(
+        let velocity = Math.floor(-circlesLength / 2); 
+        velocity <= Math.ceil(circlesLength); 
+        velocity++
+    ){
+        let coefficient = [0, 0]
         let input = 0
 
         for(const pointId in points){
             // Output of function: [a, bi]
             const output = points[pointId]
 
-            // e^{term}
+            // e^{in} = cos(n) + i*sin(n)
             let term = [
-                Math.cos(-2 * Math.PI * input * circle.velocity),
-                Math.sin(-2 * Math.PI * input * circle.velocity),
+                Math.cos(-2 * Math.PI * input * velocity),
+                Math.sin(-2 * Math.PI * input * velocity),
             ]
 
-            // Calculate Integral
-            circle.control[0] += (output[0] * term[0] + output[1] * term[1] * (-1)) * dt
-            circle.control[1] += (output[0] * term[1] + output[1] * term[0]) * dt
+            // Compute Integral
+            coefficient[0] += (output[0] * term[0] - output[1] * term[1]) * dt
+            coefficient[1] += (output[0] * term[1] + output[1] * term[0]) * dt
 
             // Add time's variation
             input += dt
         }
-        
+
+        addCircle(coefficient, velocity)
     }
 }
     
@@ -121,7 +100,7 @@ function render(){
     */
 
     let center = [0, 0]
-    let complexFunc = [0, 0]
+    let complexOutput = [0, 0]
 
     // Sum of each circle
     for(const circleId in circles){
@@ -129,8 +108,8 @@ function render(){
         const circle = circles[circleId]
 
         // Before modification
-        center[0] = complexFunc[0]
-        center[1] = complexFunc[1]
+        center[0] = complexOutput[0]
+        center[1] = complexOutput[1]
 
         // Initial Circle - time -> [a, bi]
         let initialCircle = [
@@ -139,8 +118,8 @@ function render(){
         ]
         
         // Sum of circle
-        complexFunc[0] += circle.control[0] * initialCircle[0] - circle.control[1] * initialCircle[1]
-        complexFunc[1] += circle.control[0] * initialCircle[1] + circle.control[1] * initialCircle[0]
+        complexOutput[0] += circle.control[0] * initialCircle[0] - circle.control[1] * initialCircle[1]
+        complexOutput[1] += circle.control[0] * initialCircle[1] + circle.control[1] * initialCircle[0]
         
         // Draw circle/vector
         draw.circle(
@@ -151,16 +130,15 @@ function render(){
         draw.vector(
             center[0], 
             center[1], 
-            complexFunc[0], 
-            complexFunc[1]
+            complexOutput[0], 
+            complexOutput[1]
         )
-        
     }
 
     // Draw output of function
     draw.point(
-        complexFunc[0], 
-        complexFunc[1]
+        complexOutput[0], 
+        complexOutput[1]
     )
     
     if(showPoints){
@@ -190,24 +168,21 @@ canvasLayer2.addEventListener('click', evt => {
    
     if(edit && points.length != 0){
 
-        let initPoint = []
+        let initPoints = []
         let collecs = []
+
         for(let k = 0; k < 2; k++){
-            initPoint.push(points[points.length - 1][k])
-            collecs.push(Math.abs(mouseAxies[k] - initPoint[k]))
+            initPoints.push(points[points.length - 1][k])
+            collecs.push(mouseAxies[k] - initPoints[k])
         }
 
-        let hip = Math.sqrt(Math.pow(collecs[0], 2) + Math.pow(collecs[1], 2))
-        let numberOfPoints = hip * 10
-        
-        // Divide collectores by n
-        let dx = collecs[0] / numberOfPoints
-        let dy = collecs[1] / numberOfPoints
+        let hip = (collecs[0]**2 + collecs[1]**2)**0.5
+        let numberOfPoints = hip * 8
 
         for(let i = 0; i < numberOfPoints - 1; i++){
-            initPoint[0] += dx
-            initPoint[1] += dy
-            points.push(initPoint[0], initPoint[1])
+            initPoints[0] += collecs[0] / numberOfPoints
+            initPoints[1] += collecs[1] / numberOfPoints
+            points.push([initPoints[0], initPoints[1]])
         }
 
     }else if(edit){
