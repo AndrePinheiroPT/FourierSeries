@@ -2,12 +2,19 @@ import { Draw } from './drawTools.js'
 
 const canvasLayer1 = document.querySelector("#layer1")
 const canvasLayer2 = document.querySelector("#layer2")
-const ctx2 = canvasLayer2.getContext('2d')
 const ctx = canvasLayer1.getContext('2d')
 const images = document.querySelectorAll(".images")
 let imageSelected = null
 let edit = false
 
+let time = 0
+let circles = {}
+let points = []
+let mouseAxies = [0, 0]
+let showPoints = true
+let pointSelected = null
+
+const draw = new Draw()
 export function controlImage(key){
     imageSelected = images[key]
 }
@@ -20,17 +27,10 @@ export function setEditMode(){
 }
 setEditMode()
 
-// Time of program
-let time = 0
-let circles = {}
-let points = []  
-
-let showPoints = true
-let mouseAxies = [0, 0]
-
-const draw = new Draw()
-
-
+function addCircle(coefficient, velocity){
+    let radius = (coefficient[0]**2 + coefficient[1]**2)**0.5
+    circles[radius] = { coefficient, velocity, radius }
+}
 
 function getMousePosition(evt){
     let rect = canvasLayer2.getBoundingClientRect()
@@ -39,18 +39,9 @@ function getMousePosition(evt){
         y: (500 - (evt.clientY - rect.top -10) / 550 * 1000) / 100,
     }
 }
-function addCircle(control = [1, 0], velocity = 1){
 
-    // Random name
-    let randomId = Math.floor(Math.random() * 99999)
 
-    circles[randomId] = {
-        control,
-        velocity
-    }
-}
-
-export function setCircles(circlesLength){
+export function doFourier(circlesLength){
     // time's variation
     const dt = 1 / points.length
     for(
@@ -82,7 +73,7 @@ export function setCircles(circlesLength){
         addCircle(coefficient, velocity)
     }
 }
-    
+
 function render(){
     draw.background()
     if(imageSelected == null){
@@ -94,52 +85,29 @@ function render(){
         ctx.restore()
     }
 
-    /*
-    Center of circles - [a, bi]
-    Complex function - time -> [a, bi]
-    */
-
-    let center = [0, 0]
-    let complexOutput = [0, 0]
-
-    // Sum of each circle
+    let output = [0, 0]
     for(const circleId in circles){
-
         const circle = circles[circleId]
 
-        // Before modification
-        center[0] = complexOutput[0]
-        center[1] = complexOutput[1]
-
-        // Initial Circle - time -> [a, bi]
         let initialCircle = [
             Math.cos(2 * Math.PI * time * circle.velocity),
             Math.sin(2 * Math.PI * time * circle.velocity) 
         ]
         
         // Sum of circle
-        complexOutput[0] += circle.control[0] * initialCircle[0] - circle.control[1] * initialCircle[1]
-        complexOutput[1] += circle.control[0] * initialCircle[1] + circle.control[1] * initialCircle[0]
+        let dx = circle.coefficient[0] * initialCircle[0] - circle.coefficient[1] * initialCircle[1]
+        let dy = circle.coefficient[0] * initialCircle[1] + circle.coefficient[1] * initialCircle[0]
+        output[0] += dx
+        output[1] += dy
         
         // Draw circle/vector
-        draw.circle(
-            center[0], 
-            center[1], 
-            Math.sqrt(Math.pow(circle.control[0], 2) + Math.pow(circle.control[1], 2))
-        )
-        draw.vector(
-            center[0], 
-            center[1], 
-            complexOutput[0], 
-            complexOutput[1]
-        )
+        let radius = (circle.coefficient[0]**2 + circle.coefficient[1]**2)**0.5
+        draw.circle(output[0] - dx, output[1] - dy, radius)
+        draw.vector(output[0] - dx, output[1] - dy, output[0], output[1])
     }
 
     // Draw output of function
-    draw.point(
-        complexOutput[0], 
-        complexOutput[1]
-    )
+    draw.point(output[0], output[1])
     
     if(showPoints){
         for(let pointId in points){
@@ -148,10 +116,10 @@ function render(){
         }
     }
 
-    if(edit && points.length != 0){
+    if(edit && pointSelected != null){
         draw.vector(
-            points[points.length - 1][0], 
-            points[points.length - 1][1],
+            pointSelected[0], 
+            pointSelected[1],
             mouseAxies[0], 
             mouseAxies[1],
             "rgba(0, 255, 0, 0.3)"
@@ -161,33 +129,45 @@ function render(){
     // Add 1 milisecound
     time += 1 / 1000
 }
-
 setInterval(render, 1)
 
 canvasLayer2.addEventListener('click', evt => {
-   
-    if(edit && points.length != 0){
+    
+    if(edit && pointSelected != null){
 
         let initPoints = []
         let collecs = []
 
         for(let k = 0; k < 2; k++){
-            initPoints.push(points[points.length - 1][k])
+            initPoints.push(pointSelected[k])
             collecs.push(mouseAxies[k] - initPoints[k])
         }
 
         let hip = (collecs[0]**2 + collecs[1]**2)**0.5
         let numberOfPoints = hip * 8
 
-        for(let i = 0; i < numberOfPoints - 1; i++){
+        for(let i = 0; i < numberOfPoints - 2; i++){
             initPoints[0] += collecs[0] / numberOfPoints
             initPoints[1] += collecs[1] / numberOfPoints
             points.push([initPoints[0], initPoints[1]])
         }
 
-    }else if(edit){
-        points.push([mouseAxies[0], mouseAxies[1]])
+        pointSelected = null
     }
+
+    for(const pointId in points){
+        const output = points[pointId]
+
+        if(mouseAxies[0] <= output[0] + 0.05 && 
+            mouseAxies[0] >= output[0] - 0.05 && 
+            mouseAxies[1] <= output[1] + 0.05 &&
+            mouseAxies[1] >= output[1] - 0.05 && edit){
+                pointSelected = output
+                count++
+        }
+    }
+
+    if (edit && pointSelected === null) points.push([mouseAxies[0], mouseAxies[1]])
 })
 
 canvasLayer2.addEventListener('mousemove', evt => {
