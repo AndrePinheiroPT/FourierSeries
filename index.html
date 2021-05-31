@@ -7,36 +7,24 @@
     <link rel="stylesheet" href="style/style.css">
 </head>
 <body>
-    
     <canvas height="1000" width="1000" class="canvas" id="layer1"></canvas>
     <canvas height="1000" width="1000" class="canvas" id="layer2"></canvas>
     <div class="images-list">
-        <img 
-        onclick="controlImage(0)" 
-        src="img/sigma.jpg" 
-        class="images">
-        <br>
-        <img 
-        onclick="controlImage(1)" 
-        src="img/pi.png" 
-        class="images">
-        <br>
-        <button 
-        onclick="controlImage('remove')" 
-        class="button-images">Clear</button>
-        <br>
-        <button 
-        onclick="setEditMode()" 
-        class="button-images edit-button">Edit Mode</button>
+        <input type="file" accept="image/*" name="image" class="inputs" onchange="loadImage(event)"><br>
+        <img onclick="controlImage(1)" id="output"><br>
+        <button onclick="controlImage(0)" class="buttons">Clear</button><br>
+        <button onclick="setEditMode()" class="buttons" id='edit-button'>Edit Mode</button>
     </div>
     
     <script type="module" src="src/main.js"></script>
+    <script type="module" src="src/events.js"></script>
     <script type="module">
-        import { controlImage, setEditMode, doFourier, circles } from './src/main.js'
+        import { controlImage, setEditMode, doFourier, addCircle, loadImage } from './src/main.js'
+        window.loadImage = loadImage
         window.controlImage = controlImage
         window.setEditMode = setEditMode
         window.doFourier = doFourier
-        window.circles = circles
+        window.addCircle = addCircle
     </script>
 </body>
 </html>
