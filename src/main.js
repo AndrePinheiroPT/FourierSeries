@@ -77,6 +77,11 @@ function render(){
     }else{ 
         draw.background(ctx1, true)
     }
+    if(image.src == ""){
+        image.style.opacity = 0
+    }else{
+        image.style.opacity = 1
+    }
 
     let output = [0, 0]
     for(const circleId in circles){

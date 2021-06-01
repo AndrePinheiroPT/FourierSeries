@@ -7,13 +7,15 @@
     <link rel="stylesheet" href="style/style.css">
 </head>
 <body>
+    <h1 class="title">Fourier Series - JavaScript v1.0.0</h1>
     <canvas height="1000" width="1000" class="canvas" id="layer1"></canvas>
     <canvas height="1000" width="1000" class="canvas" id="layer2"></canvas>
     <div class="images-list">
-        <input type="file" accept="image/*" name="image" class="inputs" onchange="loadImage(event)"><br>
+        <button class="buttons">Upload Image</button>
+        <input type="file" accept="image/*" name="image" class="inputs" onchange="loadImage(event)">
         <img onclick="controlImage(1)" id="output"><br>
         <button onclick="controlImage(0)" class="buttons">Clear</button><br>
-        <button onclick="setEditMode()" class="buttons" id='edit-button'>Edit Mode</button>
+        <button onclick="setEditMode()" class="buttons" id='edit-button'>Edit Mode</button><br>
     </div>
     
     <script type="module" src="src/main.js"></script>
@@ -26,5 +28,10 @@
         window.doFourier = doFourier
         window.addCircle = addCircle
     </script>
+    <footer class="footer">
+Fourier Series v1.0.0
+Copyright &copy;2021 André Pinheiro
+Read the licence for more informations.
+</footer>
 </body>
 </html>
