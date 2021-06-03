@@ -1,16 +1,10 @@
-const canvasLayer1 = document.querySelector("#layer1")
-const canvasLayer2 = document.querySelector("#layer2")
-
-const ctx = canvasLayer1.getContext('2d')
-const ctx2 = canvasLayer2.getContext('2d')
-
-const cyan = "rgba(255, 255, 255, 0.2)"
+const cyan = "rgba(255, 255, 255, 0.4)"
 const blue = "rgba(25, 255, 255, 0.3)"
 const yellow = "rgba(255, 255, 25, 0.8)"
 const white = "rgba(255, 255, 255, 0.7)"
 
 export class Draw{
-    background(activateGrid = true){
+    background(ctx, activateGrid = true){
         ctx.fillRect(0, 0, 1000, 1000)
         ctx.fillStyle = "black"
 
@@ -21,7 +15,7 @@ export class Draw{
             for(let i = 0; i < 2; i++){
                 for(let k = 0; k < 1000; k += 100){
                     ctx.beginPath()
-                    if(i == 0){
+                    if(!i){
                         ctx.moveTo(0, k)
                         ctx.lineTo(1000, k)
                     }else{
@@ -34,7 +28,7 @@ export class Draw{
 
                     ctx.font = "20px Arial"
                     ctx.strokeStyle = cyan
-                    if(i == 0){
+                    if(!i){
                         ctx.strokeText(`${counterY--} i`, 505, k + 20)
                     }else{
                         ctx.strokeText(`${counterX++}`, k + 5, 520)
@@ -44,7 +38,14 @@ export class Draw{
         }
     }
 
-    circle(x, y, r, color=blue){
+    image(ctx, image){
+        ctx.save()
+        ctx.globalAlpha = 0.3;
+        ctx.drawImage(image, 0, 0) 
+        ctx.restore()
+    }
+
+    circle(ctx, x, y, r, color=blue){
         ctx.beginPath()
         ctx.arc(500 + x * 100, 500 - y * 100, r * 100, 0, 2*Math.PI)
         ctx.strokeStyle = color
@@ -52,7 +53,7 @@ export class Draw{
         ctx.stroke()
     }
 
-    vector(xi, yi, xe, ye, color=white){
+    vector(ctx, xi, yi, xe, ye, color=white){
         ctx.beginPath()
         ctx.moveTo(500 + xi * 100, 500 - yi * 100)
         ctx.lineTo(500 + xe * 100, 500 - ye * 100)
@@ -61,17 +62,12 @@ export class Draw{
         ctx.stroke()
     }
 
-    point(x, y){
-        ctx2.fillStyle = yellow
-        ctx2.fillRect(500 + x * 100, 500 - y * 100, 3, 3)
+    point(ctx, x, y){
+        ctx.fillStyle = yellow
+        ctx.fillRect(500 + x * 100, 500 - y * 100, 3, 3)
     }
 
-    clear(removePoints=false){
-        ctx2.clearRect(0, 0, 1000, 1000)
-        circles = {}
-        if(removePoints){
-            drawAxies = []
-            len = drawAxies.length
-        }
+    clearContent(ctx){
+        ctx.clearRect(0, 0, 1000, 1000)
     }
 }

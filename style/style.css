@@ -3,31 +3,49 @@
     src: url('lilitaone.ttf');
 }
 * {
-    font-family: lilita one;
+    font-family: 'Roboto Slab', serif;
     font-size: 12pt;
     margin: 0;
     padding: 0;
+    color: white;
 }
 body{
-    background-color: rgb(46, 46, 46);
+    background-color: rgb(10, 10, 10);
+}
+.title{
+    color: white;
+    font-size: 25pt;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 10px;
 }
 .images-list{
     position: absolute;
-    top: 0;
+    top: 60px;
     left: 570px;
 }
-.button-images{
-    padding: 2px;
-    border: 3px solid rgb(75, 75, 75);
-    background-color: rgb(37, 37, 37);
+.buttons{
+    padding: 2px; 
+    border: 3px solid rgb(37, 37, 37);
+    background-color: rgb(49, 49, 49);
     color: white;
-    width: 56px;
+    width: 70px;
     height: 56px;
 }
-.images{
-    border: 3px solid rgb(75, 75, 75);
+.inputs{
+    width: 70px;
+    height: 56px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+}
+#output{
+    position: absolute;
+    border: 3px solid rgb(37, 37, 37);
     width: 50px;
     height: 50px;
+    background-color: rgb(75, 75, 75); 
 }
 .canvas{
     position: absolute;
@@ -35,12 +53,17 @@ body{
     height: 550px;
     border: solid 10px black;
 }
+.footer{
+    position: absolute;
+    bottom: 0;
+    color: white;
+    font-size: 14pt;
+    padding: 10px;
+    white-space: pre;
+}
 #layer1{
     opacity: 1;
 }
 #layer2{
     opacity: 0.8;
-}
-#layer3{
-    opacity: 0.2;
 }
