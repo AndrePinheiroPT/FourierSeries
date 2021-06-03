@@ -3,10 +3,11 @@
     src: url('lilitaone.ttf');
 }
 * {
-    font-family: lilita one;
+    font-family: 'Roboto Slab', serif;
     font-size: 12pt;
     margin: 0;
     padding: 0;
+    color: white;
 }
 body{
     background-color: rgb(10, 10, 10);

@@ -67,12 +67,7 @@ export class Draw{
         ctx.fillRect(500 + x * 100, 500 - y * 100, 3, 3)
     }
 
-    clear(ctx, removePoints=false){
+    clearContent(ctx){
         ctx.clearRect(0, 0, 1000, 1000)
-        circles = {}
-        if(removePoints){
-            drawAxies = []
-            len = drawAxies.length
-        }
     }
 }

@@ -1,7 +1,15 @@
-import { mouseState, points, edit } from './main.js'
+import { mouseState, points, edit, doFourier } from './main.js'
 
+const circleRange = document.querySelector('#circle-range')
+const circleOutput = document.querySelector('#circle-output')
+const dtimeRange = document.querySelector('#dtime-range')
+const dtimeOutput = document.querySelector('#dtime-output')
 const canvasLayer2 = document.querySelector("#layer2")
 export let pointSelected = null
+export let circlesLength = circleRange.value
+export let dtime = dtimeRange.value
+circleOutput.innerHTML = `Circles: ${circleRange.value}`
+dtimeOutput.innerHTML = `&Delta;t: ${dtimeRange.value}` 
 
 function getMousePosition(evt){
     let rect = canvasLayer2.getBoundingClientRect()
@@ -9,6 +17,17 @@ function getMousePosition(evt){
         x: ((evt.clientX - rect.left - 10) / 550 * 1000 - 500) / 100,
         y: (500 - (evt.clientY - rect.top -10) / 550 * 1000) / 100,
     }
+}
+
+circleRange.oninput = function(){
+    circleOutput.innerHTML = `Circles: ${this.value}`
+    circlesLength = this.value
+    doFourier()
+}
+
+dtimeRange.oninput = function(){
+    dtimeOutput.innerHTML = `&Delta;t: ${this.value}` 
+    dtime = this.value
 }
 
 canvasLayer2.addEventListener('click', evt => {

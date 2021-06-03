@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fourier</title>
     <link rel="stylesheet" href="style/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@300&display=swap" rel="stylesheet">
 </head>
 <body>
     <h1 class="title">Fourier Series - JavaScript v1.0.0</h1>
@@ -16,6 +17,9 @@
         <img onclick="controlImage(1)" id="output"><br>
         <button onclick="controlImage(0)" class="buttons">Clear</button><br>
         <button onclick="setEditMode()" class="buttons" id='edit-button'>Edit Mode</button><br>
+        <button onclick="doFourier()" class="buttons">Draw!</button><br>
+        <input type="range" min="0" max="30" id="circle-range"><div id="circle-output"></div>
+        <input type="range" min="1" max="5" id="dtime-range"><div id="dtime-output"></div>
     </div>
     
     <script type="module" src="src/main.js"></script>

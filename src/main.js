@@ -1,5 +1,5 @@
 import { Draw } from './drawTools.js'
-import { pointSelected } from './events.js'
+import { pointSelected, circlesLength, dtime } from './events.js'
 
 const draw = new Draw()
 
@@ -37,12 +37,14 @@ export function addCircle(coefficient, velocity){
     circles[radius] = { coefficient, velocity, radius }
 }
 
-export function doFourier(circlesLength){
+export function doFourier(){
+    draw.clearContent(ctx2)
+    circles = {}
     // time's variation
     const dt = 1 / points.length
     for(
         let velocity = Math.floor(-circlesLength / 2); 
-        velocity <= Math.ceil(circlesLength); 
+        velocity <= Math.floor(circlesLength); 
         velocity++
     ){
         let coefficient = [0, 0]
@@ -126,6 +128,6 @@ function render(){
     }
     
     // Add 1 milisecound
-    time += 1 / 2000
+    time += 1 / (1000 * dtime)
 }
 setInterval(render, 1)
