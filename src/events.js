@@ -45,7 +45,7 @@ canvasLayer2.addEventListener('click', evt => {
         let hip = (collecs[0]**2 + collecs[1]**2)**0.5
         let numberOfPoints = hip * 8
 
-        for(let i = 0; i < numberOfPoints - 2; i++){
+        for(let i = 0; i < numberOfPoints - 1.3; i++){
             initPoints[0] += collecs[0] / numberOfPoints
             initPoints[1] += collecs[1] / numberOfPoints
             points.push([initPoints[0], initPoints[1]])

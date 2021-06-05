@@ -14,7 +14,6 @@ let circles = {}
 export let points = []
 export let mouseState = []
 export let edit = false
-let showPoints = true
 let imageSelected = false
 
 export function setEditMode(){
@@ -37,6 +36,21 @@ export function addCircle(coefficient, velocity){
     circles[radius] = { coefficient, velocity, radius }
 }
 
+function sortCircles(circlesList){
+    let newList = []
+    for(const circleId in circlesList){
+        const circle = circles[circleId]
+        newList.push(circle)
+    }
+
+    newList.sort((a, b) => {
+        if(a.radius > b.radius) return -1
+        if(a.radius < b.radius) return 1
+        return 0
+    })
+    return newList
+}
+
 export function doFourier(){
     draw.clearContent(ctx2)
     circles = {}
@@ -44,7 +58,7 @@ export function doFourier(){
     const dt = 1 / points.length
     for(
         let velocity = Math.floor(-circlesLength / 2); 
-        velocity <= Math.floor(circlesLength); 
+        velocity < Math.floor(circlesLength / 2); 
         velocity++
     ){
         let coefficient = [0, 0]
@@ -86,8 +100,9 @@ function render(){
     }
 
     let output = [0, 0]
-    for(const circleId in circles){
-        const circle = circles[circleId]
+    let newCircles = sortCircles(circles)
+    for(let i = 0; i < newCircles.length; i++){
+        const circle = newCircles[i]
 
         let initialCircle = [
             Math.cos(2 * Math.PI * time * circle.velocity),
@@ -109,7 +124,7 @@ function render(){
     // Draw output of function
     draw.point(ctx2, output[0], output[1])
     
-    if(showPoints){
+    if(edit){
         for(let pointId in points){
             const point = points[pointId]
             draw.circle(ctx1, point[0], point[1], 0.05, "rgba(0, 255, 0, 0.3)")
